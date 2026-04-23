@@ -1,0 +1,24 @@
+{
+  "name": "record-collection",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler pages dev ./dist",
+    "sync-db": "wrangler d1 execute record-collection-db --local --file=./schema.sql",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.7.0",
+    "@astrojs/cloudflare": "^12.0.0",
+    "@astrojs/preact": "^4.0.0",
+    "@astrojs/tailwind": "^6.0.0",
+    "preact": "^10.26.0",
+    "tailwindcss": "^3.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "wrangler": "^4.0.0"
+  }
+}
