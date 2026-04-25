@@ -8,6 +8,7 @@ export interface Release {
   year: number | null;
   format: string | null;
   thumb_url: string | null;
+  cover_image_url: string | null;
 }
 
 export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
@@ -20,6 +21,7 @@ export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
     year: basic.year || null,
     format: basic.formats?.[0]?.name ?? null,
     thumb_url: basic.thumb || null,
+    cover_image_url: basic.cover_image || null,
   };
 }
 
@@ -30,8 +32,8 @@ export async function upsertReleases(
   if (releases.length === 0) return;
 
   const stmt = db.prepare(
-    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, thumb_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, thumb_url, cover_image_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(release_id) DO UPDATE SET
        instance_id = excluded.instance_id,
        title = excluded.title,
@@ -39,6 +41,7 @@ export async function upsertReleases(
        year = excluded.year,
        format = excluded.format,
        thumb_url = excluded.thumb_url,
+       cover_image_url = excluded.cover_image_url,
        updated_at = datetime('now')`
   );
 
@@ -50,7 +53,8 @@ export async function upsertReleases(
       r.artist,
       r.year,
       r.format,
-      r.thumb_url
+      r.thumb_url,
+      r.cover_image_url
     )
   );
 

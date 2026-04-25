@@ -24,6 +24,7 @@ export interface DiscogsCollectionItem {
     year: number;
     formats: { name: string; qty: string; descriptions: string[] }[];
     thumb: string;
+    cover_image: string;
     artists: { name: string; join: string }[];
   };
 }

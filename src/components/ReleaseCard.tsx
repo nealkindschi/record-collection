@@ -5,12 +5,14 @@ interface Props {
 }
 
 export default function ReleaseCard({ release }: Props) {
+  const imgSrc = release.cover_image_url || release.thumb_url;
+
   return (
     <div class="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors">
       <div class="aspect-square bg-gray-800">
-        {release.thumb_url ? (
+        {imgSrc ? (
           <img
-            src={release.thumb_url}
+            src={imgSrc}
             alt={release.title}
             class="w-full h-full object-cover"
             loading="lazy"

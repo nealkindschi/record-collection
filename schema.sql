@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS releases (
+DROP TABLE IF EXISTS releases;
+
+CREATE TABLE releases (
   release_id INTEGER PRIMARY KEY,
   instance_id INTEGER,
   title TEXT NOT NULL,
@@ -6,11 +8,12 @@ CREATE TABLE IF NOT EXISTS releases (
   year INTEGER,
   format TEXT,
   thumb_url TEXT,
+  cover_image_url TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );
 
-CREATE INDEX IF NOT EXISTS idx_releases_artist ON releases(artist);
-CREATE INDEX IF NOT EXISTS idx_releases_year ON releases(year);
-CREATE INDEX IF NOT EXISTS idx_releases_format ON releases(format);
-CREATE INDEX IF NOT EXISTS idx_releases_title ON releases(title);
+CREATE INDEX idx_releases_artist ON releases(artist);
+CREATE INDEX idx_releases_year ON releases(year);
+CREATE INDEX idx_releases_format ON releases(format);
+CREATE INDEX idx_releases_title ON releases(title);
