@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import CollectionApp from "../components/CollectionApp";
+import { searchReleases } from "../utils/db";
+
+const db = Astro.locals.runtime.env.DB;
+const { results: initialResults, total: initialTotal } = await searchReleases(db, { limit: 24, offset: 0 });
 ---
 
 <BaseLayout title="Record Collection">
@@ -9,6 +13,6 @@ import CollectionApp from "../components/CollectionApp";
       <h1 class="text-3xl font-bold text-white">Record Collection</h1>
       <p class="text-gray-400 mt-1">Search and browse your Discogs collection</p>
     </header>
-    <CollectionApp client:load />
+    <CollectionApp client:load initialResults={initialResults} initialTotal={initialTotal} />
   </div>
 </BaseLayout>
