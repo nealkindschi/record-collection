@@ -2,13 +2,23 @@ interface Props {
   format: string;
   formats: string[];
   onFormatChange: (format: string) => void;
+  year: number | "";
+  years: { min: number; max: number } | null;
+  onYearChange: (year: number | "") => void;
 }
 
 export default function FilterPanel({
   format,
   formats,
   onFormatChange,
+  year,
+  years,
+  onYearChange,
 }: Props) {
+  const yearOptions: number[] = years
+    ? Array.from({ length: years.max - years.min + 1 }, (_, i) => years.max - i)
+    : [];
+
   return (
     <div class="bg-gray-900 rounded-lg p-4">
       <h2 class="text-sm font-semibold text-gray-300 mb-3">Filters</h2>
@@ -31,6 +41,27 @@ export default function FilterPanel({
             ))}
           </select>
         </div>
+
+        {years && (
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Year</label>
+            <select
+              value={year}
+              onChange={(e) => {
+                const val = (e.target as HTMLSelectElement).value;
+                onYearChange(val ? parseInt(val, 10) : "");
+              }}
+              class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">All Years</option>
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
     </div>
   );
