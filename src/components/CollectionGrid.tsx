@@ -5,9 +5,12 @@ interface Props {
   results: Release[];
   total: number;
   loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }
 
-export default function CollectionGrid({ results, total, loading }: Props) {
+export default function CollectionGrid({ results, total, loading, loadingMore, hasMore, onLoadMore }: Props) {
   if (loading) {
     return (
       <div class="flex items-center justify-center py-20">
@@ -29,13 +32,24 @@ export default function CollectionGrid({ results, total, loading }: Props) {
   return (
     <div>
       <p class="text-xs text-gray-500 mb-4">
-        {total} {total === 1 ? "release" : "releases"} found
+        Showing {results.length} of {total} {total === 1 ? "release" : "releases"}
       </p>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {results.map((release) => (
           <ReleaseCard key={release.release_id} release={release} />
         ))}
       </div>
+      {hasMore && (
+        <div class="flex justify-center mt-8">
+          <button
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            class="bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-gray-300 text-sm font-medium rounded-lg px-6 py-2.5 transition-colors"
+          >
+            {loadingMore ? "Loading..." : "Load More"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

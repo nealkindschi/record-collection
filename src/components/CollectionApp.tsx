@@ -1,48 +1,73 @@
-import { useState, useEffect, useCallback } from "preact/hooks";
+import { useState, useEffect, useCallback, useRef } from "preact/hooks";
 import type { Release } from "../utils/db";
 import SearchBar from "./SearchBar";
 import FilterPanel from "./FilterPanel";
 import CollectionGrid from "./CollectionGrid";
 
-export default function CollectionApp() {
+const PAGE_SIZE = 24;
+
+interface Props {
+  initialResults?: Release[];
+  initialTotal?: number;
+}
+
+export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [format, setFormat] = useState("");
-  const [results, setResults] = useState<Release[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<Release[]>(initialResults ?? []);
+  const [total, setTotal] = useState(initialTotal ?? 0);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
   const [formats, setFormats] = useState<string[]>([]);
   const [years, setYears] = useState<{ min: number; max: number } | null>(null);
   const [year, setYear] = useState<number | "">("");
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query), 300);
     return () => clearTimeout(timer);
   }, [query]);
 
-  const fetchResults = useCallback(async () => {
-    setLoading(true);
+  const fetchResults = useCallback(async (offset = 0, append = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     try {
       const params = new URLSearchParams();
       if (debouncedQuery) params.set("q", debouncedQuery);
       if (format) params.set("format", format);
       if (year) params.set("year", String(year));
-      params.set("limit", "100");
+      params.set("limit", String(PAGE_SIZE));
+      params.set("offset", String(offset));
       const res = await fetch(`/api/search?${params.toString()}`);
       const data = await res.json();
-      setResults(data.results);
+      if (append) {
+        setResults((prev) => [...prev, ...data.results]);
+      } else {
+        setResults(data.results);
+      }
       setTotal(data.total);
     } catch {
-      setResults([]);
-      setTotal(0);
+      if (!append) {
+        setResults([]);
+        setTotal(0);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [debouncedQuery, format, year]);
 
   useEffect(() => {
+    if (isInitialRender.current && initialResults) {
+      isInitialRender.current = false;
+      return;
+    }
     fetchResults();
   }, [fetchResults]);
 
@@ -80,6 +105,12 @@ export default function CollectionApp() {
     }
   }
 
+  function handleLoadMore() {
+    fetchResults(results.length, true);
+  }
+
+  const hasMore = results.length < total;
+
   return (
     <div class="flex flex-col md:flex-row gap-6">
       <aside class="w-full md:w-56 shrink-0 space-y-4">
@@ -104,7 +135,14 @@ export default function CollectionApp() {
       </aside>
       <main class="flex-1 min-w-0">
         <SearchBar query={query} onQueryChange={setQuery} />
-        <CollectionGrid results={results} total={total} loading={loading} />
+        <CollectionGrid
+          results={results}
+          total={total}
+          loading={loading}
+          loadingMore={loadingMore}
+          hasMore={hasMore}
+          onLoadMore={handleLoadMore}
+        />
       </main>
     </div>
   );
