@@ -2,8 +2,21 @@ import type { APIRoute } from "astro";
 import { syncAllPages } from "../../utils/discogs";
 import { mapDiscogsToRelease, upsertReleases } from "../../utils/db";
 
-export const POST: APIRoute = async ({ locals }) => {
+export const POST: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime.env;
+  const syncSecret = env.SYNC_SECRET;
+  const authHeader = request.headers.get("Authorization");
+  if (
+    !syncSecret ||
+    !authHeader ||
+    authHeader !== `Bearer ${syncSecret}`
+  ) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   const db = env.DB;
   const kv = env.SYNC_KV;
   const token = env.DISCOGS_TOKEN;

@@ -38,7 +38,8 @@ export async function upsertReleases(
        artist = excluded.artist,
        year = excluded.year,
        format = excluded.format,
-       thumb_url = excluded.thumb_url`
+       thumb_url = excluded.thumb_url,
+       updated_at = datetime('now')`
   );
 
   const batch = releases.map((r) =>

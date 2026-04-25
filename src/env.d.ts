@@ -5,6 +5,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   SYNC_KV: KVNamespace;
   DISCOGS_TOKEN: string;
   DISCOGS_USERNAME: string;
+  SYNC_SECRET: string;
 }>;
 
 declare namespace App {

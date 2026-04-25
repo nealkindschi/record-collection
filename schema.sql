@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS releases (
   artist TEXT NOT NULL,
   year INTEGER,
   format TEXT,
-  thumb_url TEXT
+  thumb_url TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_releases_artist ON releases(artist);
