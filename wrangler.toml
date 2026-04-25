@@ -5,11 +5,11 @@ compatibility_date = "2024-12-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "record-collection-db"
-database_id = "REPLACE_AFTER_RUNNING_wrangler_d1_create"
+database_id = "71e620bf-1115-4594-8a78-5479b533cb07"
 
 [[kv_namespaces]]
 binding = "SYNC_KV"
-id = "REPLACE_AFTER_RUNNING_wrangler_kv_namespace_create"
+id = "0b8cde34483545378dc864eae8b52b21"
 
 [vars]
-DISCOGS_USERNAME = "REPLACE_WITH_YOUR_DISCOGS_USERNAME"
+DISCOGS_USERNAME = "nkinds"
