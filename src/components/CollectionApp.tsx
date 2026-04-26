@@ -3,6 +3,7 @@ import type { Release } from "../utils/db";
 import SearchBar from "./SearchBar";
 import FilterPanel from "./FilterPanel";
 import CollectionGrid from "./CollectionGrid";
+import TracklistOverlay from "./TracklistOverlay";
 
 const PAGE_SIZE = 24;
 
@@ -26,6 +27,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<{ min: number; max: number } | null>(null);
   const [year, setYear] = useState<number | "">("");
+  const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
   const isInitialRender = useRef(true);
 
   useEffect(() => {
@@ -149,8 +151,15 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
           loadingMore={loadingMore}
           hasMore={hasMore}
           onLoadMore={handleLoadMore}
+          onCardClick={setSelectedRelease}
         />
       </main>
+      {selectedRelease && (
+        <TracklistOverlay
+          release={selectedRelease}
+          onClose={() => setSelectedRelease(null)}
+        />
+      )}
     </div>
   );
 }

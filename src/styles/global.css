@@ -5,3 +5,16 @@
 body {
   @apply bg-gray-950 text-gray-100;
 }
+
+.overlay-backdrop {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

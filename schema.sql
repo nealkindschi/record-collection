@@ -10,6 +10,7 @@ CREATE TABLE releases (
   genre TEXT,
   thumb_url TEXT,
   cover_image_url TEXT,
+  tracklist TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );

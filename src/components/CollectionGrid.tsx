@@ -8,9 +8,18 @@ interface Props {
   loadingMore: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
+  onCardClick: (release: Release) => void;
 }
 
-export default function CollectionGrid({ results, total, loading, loadingMore, hasMore, onLoadMore }: Props) {
+export default function CollectionGrid({
+  results,
+  total,
+  loading,
+  loadingMore,
+  hasMore,
+  onLoadMore,
+  onCardClick,
+}: Props) {
   if (loading) {
     return (
       <div class="flex items-center justify-center py-20">
@@ -36,7 +45,11 @@ export default function CollectionGrid({ results, total, loading, loadingMore, h
       </p>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {results.map((release) => (
-          <ReleaseCard key={release.release_id} release={release} />
+          <ReleaseCard
+            key={release.release_id}
+            release={release}
+            onClick={onCardClick}
+          />
         ))}
       </div>
       {hasMore && (
