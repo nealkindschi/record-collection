@@ -39,7 +39,7 @@ export default function ReleaseCard({ release, onClick }: Props) {
             </svg>
           </div>
         )}
-        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30">
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30 pointer-events-none">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-8 w-8 text-white"
