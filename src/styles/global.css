@@ -10,6 +10,10 @@ body {
   animation: fadeIn 0.2s ease-out;
 }
 
+.overlay-card-inner {
+  aspect-ratio: 1 / 1;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

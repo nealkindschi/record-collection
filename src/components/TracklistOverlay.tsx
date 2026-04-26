@@ -15,7 +15,11 @@ export default function TracklistOverlay({ release, onClose }: Props) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (release.tracklist) return;
+    if (release.tracklist) {
+      setTracklist(release.tracklist);
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
 
@@ -26,11 +30,10 @@ export default function TracklistOverlay({ release, onClose }: Props) {
         const res = await fetch(
           `/api/tracklist?release_id=${release.release_id}`
         );
+        const data = await res.json();
         if (!res.ok) {
-          const data = await res.json();
           throw new Error(data.error || "Failed to fetch tracklist");
         }
-        const data = await res.json();
         if (!cancelled) {
           setTracklist(data.tracklist);
         }
@@ -55,7 +58,7 @@ export default function TracklistOverlay({ release, onClose }: Props) {
   }, [release.release_id, release.tracklist]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFlipped(true), 50);
+    const timer = setTimeout(() => setFlipped(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
@@ -63,7 +66,7 @@ export default function TracklistOverlay({ release, onClose }: Props) {
     (e: Event) => {
       if ((e.target as HTMLElement).classList.contains("overlay-backdrop")) {
         setFlipped(false);
-        setTimeout(onClose, 300);
+        setTimeout(onClose, 400);
       }
     },
     [onClose]
@@ -71,7 +74,7 @@ export default function TracklistOverlay({ release, onClose }: Props) {
 
   const handleClose = useCallback(() => {
     setFlipped(false);
-    setTimeout(onClose, 300);
+    setTimeout(onClose, 400);
   }, [onClose]);
 
   useEffect(() => {
@@ -92,20 +95,28 @@ export default function TracklistOverlay({ release, onClose }: Props) {
       onClick={handleBackdropClick}
     >
       <div
-        class="relative w-full max-w-2xl"
+        class="overlay-card w-full max-w-lg"
         style={{ perspective: "1200px" }}
       >
         <div
-          class="flip-card-inner relative w-full transition-transform duration-500 ease-in-out"
+          class="overlay-card-inner"
           style={{
+            position: "relative",
+            width: "100%",
+            transition: "transform 0.6s ease-in-out",
             transformStyle: "preserve-3d",
             transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
           }}
         >
           {/* Front face — album art */}
           <div
-            class="flip-card-front rounded-xl overflow-hidden shadow-2xl shadow-purple-500/20"
-            style={{ backfaceVisibility: "hidden" }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+            }}
+            class="rounded-xl overflow-hidden shadow-2xl shadow-purple-500/20"
           >
             <div class="bg-gray-900 aspect-square flex items-center justify-center">
               {imgSrc ? (
@@ -137,16 +148,19 @@ export default function TracklistOverlay({ release, onClose }: Props) {
 
           {/* Back face — tracklist */}
           <div
-            class="flip-card-back absolute inset-0 rounded-xl overflow-hidden shadow-2xl shadow-purple-500/20 bg-gray-900"
             style={{
+              position: "absolute",
+              inset: 0,
               backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
               transform: "rotateY(180deg)",
             }}
+            class="rounded-xl overflow-hidden shadow-2xl shadow-purple-500/20 bg-gray-900"
           >
-            <div class="flex flex-col h-full max-h-[80vh]">
+            <div class="flex flex-col h-full">
               <div class="flex items-start gap-4 p-5 border-b border-gray-800">
                 {imgSrc && (
-                  <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0">
+                  <div class="w-16 h-16 rounded-lg overflow-hidden shrink-0">
                     <img
                       src={imgSrc}
                       alt={release.title}
@@ -154,8 +168,8 @@ export default function TracklistOverlay({ release, onClose }: Props) {
                     />
                   </div>
                 )}
-                <div class="min-w-0 flex-1">
-                  <h2 class="text-lg font-semibold text-white truncate">
+                <div class="min-w-0 flex-1 pt-1">
+                  <h2 class="text-base font-semibold text-white truncate">
                     {release.title}
                   </h2>
                   <p class="text-sm text-gray-400 truncate">
@@ -177,7 +191,6 @@ export default function TracklistOverlay({ release, onClose }: Props) {
                 <button
                   onClick={handleClose}
                   class="text-gray-400 hover:text-white transition-colors p-1 -m-1"
-                  aria-label="Close"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
