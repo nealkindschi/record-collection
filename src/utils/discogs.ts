@@ -95,7 +95,7 @@ export async function fetchReleaseDetails(
   let lastStatus = 0;
   let lastBody = "";
 
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const res = await fetch(url, {
         headers: {
@@ -123,7 +123,7 @@ export async function fetchReleaseDetails(
         const retryAfter = res.headers.get("Retry-After");
         const delayMs = retryAfter
           ? parseInt(retryAfter, 10) * 1000
-          : Math.pow(2, attempt) * 2000;
+          : 5000;
         await sleep(delayMs);
         continue;
       }
