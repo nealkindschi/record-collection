@@ -15,6 +15,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [format, setFormat] = useState("");
+  const [genre, setGenre] = useState("");
   const [results, setResults] = useState<Release[]>(initialResults ?? []);
   const [total, setTotal] = useState(initialTotal ?? 0);
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [syncing, setSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
   const [formats, setFormats] = useState<string[]>([]);
+  const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<{ min: number; max: number } | null>(null);
   const [year, setYear] = useState<number | "">("");
   const isInitialRender = useRef(true);
@@ -41,6 +43,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       const params = new URLSearchParams();
       if (debouncedQuery) params.set("q", debouncedQuery);
       if (format) params.set("format", format);
+      if (genre) params.set("genre", genre);
       if (year) params.set("year", String(year));
       params.set("limit", String(PAGE_SIZE));
       params.set("offset", String(offset));
@@ -61,7 +64,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [debouncedQuery, format, year]);
+  }, [debouncedQuery, format, genre, year]);
 
   useEffect(() => {
     if (isInitialRender.current && initialResults) {
@@ -77,6 +80,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
         const res = await fetch("/api/filters");
         const data = await res.json();
         setFormats(data.formats ?? []);
+        setGenres(data.genres ?? []);
         if (data.minYear && data.maxYear) {
           setYears({ min: data.minYear, max: data.maxYear });
         }
@@ -125,6 +129,9 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
           format={format}
           formats={formats}
           onFormatChange={setFormat}
+          genre={genre}
+          genres={genres}
+          onGenreChange={setGenre}
           year={year}
           years={years}
           onYearChange={setYear}

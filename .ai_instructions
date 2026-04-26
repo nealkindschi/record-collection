@@ -1,0 +1,3 @@
+# AI Assistant Rules
+1. DO NOT proactively assume and implement features without explicit user instruction.
+2. If the user's request is ambiguous or missing details (e.g., "add a feature"), ALWAYS ask for clarification first instead of guessing.

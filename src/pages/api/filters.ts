@@ -10,6 +10,12 @@ export const GET: APIRoute = async ({ locals }) => {
       )
       .all<{ format: string }>();
 
+    const genres = await db
+      .prepare(
+        "SELECT DISTINCT genre FROM releases WHERE genre IS NOT NULL ORDER BY genre"
+      )
+      .all<{ genre: string }>();
+
     const years = await db
       .prepare(
         "SELECT MIN(year) as min_year, MAX(year) as max_year FROM releases WHERE year IS NOT NULL"
@@ -25,6 +31,7 @@ export const GET: APIRoute = async ({ locals }) => {
     return new Response(
       JSON.stringify({
         formats: formats.results.map((r) => r.format),
+        genres: genres.results.map((r) => r.genre),
         minYear: years?.min_year ?? null,
         maxYear: years?.max_year ?? null,
         artists: artists.results.map((r) => r.artist),

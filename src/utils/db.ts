@@ -7,6 +7,7 @@ export interface Release {
   artist: string;
   year: number | null;
   format: string | null;
+  genre: string | null;
   thumb_url: string | null;
   cover_image_url: string | null;
 }
@@ -20,6 +21,7 @@ export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
     artist: basic.artists?.map((a) => a.name).join(", ") ?? "Unknown",
     year: basic.year || null,
     format: basic.formats?.[0]?.name ?? null,
+    genre: basic.genres?.[0] ?? null,
     thumb_url: basic.thumb || null,
     cover_image_url: basic.cover_image || null,
   };
@@ -32,14 +34,15 @@ export async function upsertReleases(
   if (releases.length === 0) return;
 
   const stmt = db.prepare(
-    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, thumb_url, cover_image_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, genre, thumb_url, cover_image_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(release_id) DO UPDATE SET
        instance_id = excluded.instance_id,
        title = excluded.title,
        artist = excluded.artist,
        year = excluded.year,
        format = excluded.format,
+       genre = excluded.genre,
        thumb_url = excluded.thumb_url,
        cover_image_url = excluded.cover_image_url,
        updated_at = datetime('now')`
@@ -53,6 +56,7 @@ export async function upsertReleases(
       r.artist,
       r.year,
       r.format,
+      r.genre,
       r.thumb_url,
       r.cover_image_url
     )
@@ -64,6 +68,7 @@ export async function upsertReleases(
 export interface SearchOptions {
   q?: string;
   format?: string;
+  genre?: string;
   year?: number;
   artist?: string;
   limit?: number;
@@ -84,6 +89,10 @@ export async function searchReleases(
   if (options.format) {
     conditions.push("format = ?");
     params.push(options.format);
+  }
+  if (options.genre) {
+    conditions.push("genre = ?");
+    params.push(options.genre);
   }
   if (options.year) {
     conditions.push("year = ?");

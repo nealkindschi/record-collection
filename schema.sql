@@ -7,6 +7,7 @@ CREATE TABLE releases (
   artist TEXT NOT NULL,
   year INTEGER,
   format TEXT,
+  genre TEXT,
   thumb_url TEXT,
   cover_image_url TEXT,
   created_at TEXT DEFAULT (datetime('now')),
@@ -16,4 +17,5 @@ CREATE TABLE releases (
 CREATE INDEX idx_releases_artist ON releases(artist);
 CREATE INDEX idx_releases_year ON releases(year);
 CREATE INDEX idx_releases_format ON releases(format);
+CREATE INDEX idx_releases_genre ON releases(genre);
 CREATE INDEX idx_releases_title ON releases(title);

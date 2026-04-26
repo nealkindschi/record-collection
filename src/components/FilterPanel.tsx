@@ -2,6 +2,9 @@ interface Props {
   format: string;
   formats: string[];
   onFormatChange: (format: string) => void;
+  genre: string;
+  genres: string[];
+  onGenreChange: (genre: string) => void;
   year: number | "";
   years: { min: number; max: number } | null;
   onYearChange: (year: number | "") => void;
@@ -11,6 +14,9 @@ export default function FilterPanel({
   format,
   formats,
   onFormatChange,
+  genre,
+  genres,
+  onGenreChange,
   year,
   years,
   onYearChange,
@@ -41,6 +47,26 @@ export default function FilterPanel({
             ))}
           </select>
         </div>
+
+        {genres && genres.length > 0 && (
+          <div>
+            <label class="block text-xs text-gray-400 mb-1">Genre</label>
+            <select
+              value={genre}
+              onChange={(e) =>
+                onGenreChange((e.target as HTMLSelectElement).value)
+              }
+              class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <option value="">All Genres</option>
+              {genres.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {years && (
           <div>
