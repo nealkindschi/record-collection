@@ -38,18 +38,28 @@ export default function CollectionGrid({
     );
   }
 
+  function handleGridClick(e: Event) {
+    const target = (e.target as HTMLElement).closest(
+      "[data-release-id]"
+    ) as HTMLElement | null;
+    if (!target) return;
+    const id = Number(target.dataset.releaseId);
+    const release = results.find((r) => r.release_id === id);
+    if (release) onCardClick(release);
+  }
+
   return (
     <div>
       <p class="text-xs text-gray-500 mb-4">
-        Showing {results.length} of {total} {total === 1 ? "release" : "releases"}
+        Showing {results.length} of {total}{" "}
+        {total === 1 ? "release" : "releases"}
       </p>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+        onClick={handleGridClick}
+      >
         {results.map((release) => (
-          <ReleaseCard
-            key={release.release_id}
-            release={release}
-            onClick={onCardClick}
-          />
+          <ReleaseCard key={release.release_id} release={release} />
         ))}
       </div>
       {hasMore && (

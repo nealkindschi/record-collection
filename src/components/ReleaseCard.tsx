@@ -2,16 +2,15 @@ import type { Release } from "../utils/db";
 
 interface Props {
   release: Release;
-  onClick: (release: Release) => void;
 }
 
-export default function ReleaseCard({ release, onClick }: Props) {
+export default function ReleaseCard({ release }: Props) {
   const imgSrc = release.cover_image_url || release.thumb_url;
 
   return (
     <div
+      data-release-id={release.release_id}
       class="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-all duration-200 cursor-pointer hover:scale-[1.03] hover:shadow-lg hover:shadow-purple-500/10 group relative"
-      onClick={() => onClick(release)}
     >
       <div class="aspect-square bg-gray-800 overflow-hidden">
         {imgSrc ? (
@@ -42,7 +41,7 @@ export default function ReleaseCard({ release, onClick }: Props) {
         <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30 pointer-events-none">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-8 w-8 text-white"
+            class="h-8 w-8 text-white pointer-events-none"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
