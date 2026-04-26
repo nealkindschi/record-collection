@@ -187,6 +187,17 @@ export async function updateReleaseTracklist(
     .run();
 }
 
+export async function getUncachedReleaseIds(
+  db: D1Database
+): Promise<number[]> {
+  const result = await db
+    .prepare(
+      "SELECT release_id FROM releases WHERE tracklist IS NULL ORDER BY artist, title"
+    )
+    .all<{ release_id: number }>();
+  return result.results.map((r) => r.release_id);
+}
+
 export async function getReleaseById(
   db: D1Database,
   releaseId: number

@@ -4,6 +4,7 @@ import SearchBar from "./SearchBar";
 import FilterPanel from "./FilterPanel";
 import CollectionGrid from "./CollectionGrid";
 import TracklistOverlay from "./TracklistOverlay";
+import PrewarmBar from "./PrewarmBar";
 
 const PAGE_SIZE = 24;
 
@@ -28,6 +29,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [years, setYears] = useState<{ min: number; max: number } | null>(null);
   const [year, setYear] = useState<number | "">("");
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
+  const [prewarmReady, setPrewarmReady] = useState(false);
   const isInitialRender = useRef(true);
 
   useEffect(() => {
@@ -71,10 +73,15 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   useEffect(() => {
     if (isInitialRender.current && initialResults) {
       isInitialRender.current = false;
+      setPrewarmReady(true);
       return;
     }
     fetchResults();
   }, [fetchResults]);
+
+  useEffect(() => {
+    if (!loading && results.length > 0) setPrewarmReady(true);
+  }, [loading, results.length]);
 
   useEffect(() => {
     async function loadFilters() {
@@ -160,6 +167,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
           onClose={() => setSelectedRelease(null)}
         />
       )}
+      <PrewarmBar active={prewarmReady} />
     </div>
   );
 }
