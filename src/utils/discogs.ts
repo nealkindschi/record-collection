@@ -92,47 +92,69 @@ export async function fetchReleaseDetails(
   token: string
 ): Promise<DiscogsTrack[]> {
   const url = `${DISCOGS_BASE_URL}/releases/${releaseId}`;
+  let lastStatus = 0;
+  let lastBody = "";
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Discogs token=${token}`,
-        "User-Agent": "RecordCollectionApp/1.0",
-      },
-    });
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Discogs token=${token}`,
+          "User-Agent": "RecordCollectionApp/1.0",
+        },
+      });
 
-    if (res.ok) {
-      const data = (await res.json()) as DiscogsReleaseResponse;
-      return (
-        data.tracklist?.filter((t) => t.type_ === "track" || !t.type_) ?? []
+      lastStatus = res.status;
+
+      if (res.ok) {
+        const data = (await res.json()) as DiscogsReleaseResponse;
+        return (
+          data.tracklist?.filter(
+            (t: Record<string, unknown>) =>
+              (t as { type_?: string }).type_ === "track" ||
+              !( "type_" in t)
+          ) ?? []
+        );
+      }
+
+      lastBody = await res.text();
+
+      if (res.status === 429) {
+        const retryAfter = res.headers.get("Retry-After");
+        const delayMs = retryAfter
+          ? parseInt(retryAfter, 10) * 1000
+          : Math.pow(2, attempt) * 2000;
+        await sleep(delayMs);
+        continue;
+      }
+
+      if (res.status >= 500) {
+        if (attempt < MAX_RETRIES - 1) {
+          await sleep(Math.pow(2, attempt) * 1000);
+          continue;
+        }
+      }
+
+      throw new Error(
+        `Discogs API error ${res.status} for release ${releaseId}: ${lastBody}`
       );
-    }
-
-    if (res.status === 429) {
-      const retryAfter = res.headers.get("Retry-After");
-      const delayMs = retryAfter
-        ? parseInt(retryAfter, 10) * 1000
-        : Math.pow(2, attempt) * 2000;
-      await sleep(delayMs);
-      continue;
-    }
-
-    if (res.status >= 500) {
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Discogs API error")) {
+        throw err;
+      }
       if (attempt < MAX_RETRIES - 1) {
         await sleep(Math.pow(2, attempt) * 1000);
         continue;
       }
-      const body = await res.text();
       throw new Error(
-        `Discogs API error ${res.status} after ${MAX_RETRIES} retries: ${body}`
+        `Discogs API fetch failed for release ${releaseId} after ${MAX_RETRIES} attempts (last status ${lastStatus}): ${err instanceof Error ? err.message : String(err)}`
       );
     }
-
-    const body = await res.text();
-    throw new Error(`Discogs API error ${res.status}: ${body}`);
   }
 
-  throw new Error(`Discogs API: max retries (${MAX_RETRIES}) exceeded`);
+  throw new Error(
+    `Discogs API: max retries (${MAX_RETRIES}) exceeded for release ${releaseId} (last status ${lastStatus}): ${lastBody}`
+  );
 }
 
 export async function syncAllPages(
