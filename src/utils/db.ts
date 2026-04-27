@@ -19,13 +19,19 @@ export interface Release {
   tracklist: Track[] | null;
 }
 
+export function normalizeArtistName(name: string): string {
+  return name.replace(/\s*\(\d+\)$/, "");
+}
+
 export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
   const basic = item.basic_information;
   return {
     release_id: item.id,
     instance_id: item.instance_id,
     title: basic.title,
-    artist: basic.artists?.map((a) => a.name).join(", ") ?? "Unknown",
+    artist:
+      basic.artists?.map((a) => normalizeArtistName(a.name)).join(", ") ??
+      "Unknown",
     year: basic.year || null,
     format: basic.formats?.[0]?.name ?? null,
     genre: basic.genres?.[0] ?? null,

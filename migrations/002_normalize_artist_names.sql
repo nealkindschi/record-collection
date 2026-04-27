@@ -1,0 +1,8 @@
+-- Migration: Normalize artist names by removing Discogs disambiguation suffixes
+-- Pattern: "Artist Name (N)" -> "Artist Name" where N is digits only
+--
+-- This migration is applied via the /api/migrate-artists endpoint since
+-- D1/SQLite does not support REGEXP_REPLACE natively.
+--
+-- Run via: POST /api/migrate-artists
+-- This endpoint reads all distinct artists, normalizes in JS, and batch-updates.
