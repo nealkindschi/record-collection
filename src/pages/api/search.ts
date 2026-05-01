@@ -9,6 +9,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
   const yearParam = url.searchParams.get("year");
   const year = yearParam ? parseInt(yearParam, 10) : undefined;
   const artist = url.searchParams.get("artist") || undefined;
+  const sort = url.searchParams.get("sort") || undefined;
   const limitParam = url.searchParams.get("limit");
   const limit = limitParam ? parseInt(limitParam, 10) : 50;
   const offsetParam = url.searchParams.get("offset");
@@ -23,6 +24,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
       artist,
       limit,
       offset,
+      sort,
     });
     return new Response(JSON.stringify({ results, total }), {
       headers: { "Content-Type": "application/json" },

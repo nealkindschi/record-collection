@@ -87,6 +87,7 @@ export interface SearchOptions {
   artist?: string;
   limit?: number;
   offset?: number;
+  sort?: string;
 }
 
 export async function searchReleases(
@@ -127,10 +128,13 @@ export async function searchReleases(
     .bind(...params)
     .first<{ total: number }>();
 
+  let orderBy = "ORDER BY artist, title";
+  if (options.sort === "title") orderBy = "ORDER BY title";
+  else if (options.sort === "year_desc") orderBy = "ORDER BY year DESC, artist, title";
+  else if (options.sort === "year_asc") orderBy = "ORDER BY year ASC, artist, title";
+
   const results = await db
-    .prepare(
-      `SELECT * FROM releases ${where} ORDER BY artist, title LIMIT ? OFFSET ?`
-    )
+    .prepare(`SELECT * FROM releases ${where} ${orderBy} LIMIT ? OFFSET ?`)
     .bind(...params, limit, offset)
     .all<Record<string, unknown>>();
 

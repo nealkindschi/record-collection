@@ -18,6 +18,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [format, setFormat] = useState("");
   const [genre, setGenre] = useState("");
+  const [sort, setSort] = useState("artist");
   const [results, setResults] = useState<Release[]>(initialResults ?? []);
   const [total, setTotal] = useState(initialTotal ?? 0);
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       if (debouncedQuery) params.set("q", debouncedQuery);
       if (format) params.set("format", format);
       if (genre) params.set("genre", genre);
+      if (sort) params.set("sort", sort);
       params.set("limit", String(PAGE_SIZE));
       params.set("offset", String(offset));
       const res = await fetch(`/api/search?${params.toString()}`);
@@ -67,7 +69,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [debouncedQuery, format, genre]);
+  }, [debouncedQuery, format, genre, sort]);
 
   useEffect(() => {
     if (isInitialRender.current && initialResults) {
@@ -115,6 +117,25 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
         />
       </aside>
       <main class="flex-1 min-w-0 space-y-5">
+        <div class="flex items-center justify-end gap-3">
+          <label class="text-xs text-wax-500 font-medium tracking-wide uppercase">Sort</label>
+          <select
+            value={sort}
+            onChange={(e) => setSort((e.target as HTMLSelectElement).value)}
+            class="bg-crate-800 border border-sun-500/25 hover:border-sun-500/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-sun-400 focus:ring-2 focus:ring-sun-400/25 transition-all duration-200 appearance-none cursor-pointer"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff6d00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 10px center",
+              paddingRight: "32px",
+            }}
+          >
+            <option value="artist">Artist (A-Z)</option>
+            <option value="title">Title (A-Z)</option>
+            <option value="year_desc">Year (Newest)</option>
+            <option value="year_asc">Year (Oldest)</option>
+          </select>
+        </div>
         <CollectionGrid
           results={results}
           total={total}
