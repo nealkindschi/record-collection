@@ -11,6 +11,7 @@ CREATE TABLE releases (
   thumb_url TEXT,
   cover_image_url TEXT,
   tracklist TEXT,
+  vinyl_size TEXT,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
 );

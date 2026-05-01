@@ -17,6 +17,19 @@ export interface Release {
   thumb_url: string | null;
   cover_image_url: string | null;
   tracklist: Track[] | null;
+  vinyl_size: string | null;
+}
+
+function getVinylSize(descriptions: string[]): string | null {
+  const set = new Set(descriptions);
+  if (set.has('7"')) return '7"';
+  if (set.has('12"')) return '12"';
+  if (set.has('10"')) return '10"';
+  if (set.has("LP")) return '12"';
+  if (set.has("Maxi-Single")) return '12"';
+  if (set.has("EP")) return '12"';
+  if (set.has("Single")) return '7"';
+  return '12"';
 }
 
 export function normalizeArtistName(name: string): string {
@@ -25,6 +38,8 @@ export function normalizeArtistName(name: string): string {
 
 export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
   const basic = item.basic_information;
+  const firstFormat = basic.formats?.[0];
+  const descriptions = firstFormat?.descriptions ?? [];
   return {
     release_id: item.id,
     instance_id: item.instance_id,
@@ -33,10 +48,11 @@ export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
       basic.artists?.map((a) => normalizeArtistName(a.name)).join(", ") ??
       "Unknown",
     year: basic.year || null,
-    format: basic.formats?.[0]?.name ?? null,
+    format: firstFormat?.name ?? null,
     genre: basic.genres?.[0] ?? null,
     thumb_url: basic.thumb || null,
     cover_image_url: basic.cover_image || null,
+    vinyl_size: firstFormat?.name === "Vinyl" ? getVinylSize(descriptions) : null,
   };
 }
 
@@ -47,8 +63,8 @@ export async function upsertReleases(
   if (releases.length === 0) return;
 
   const stmt = db.prepare(
-    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, genre, thumb_url, cover_image_url, tracklist)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO releases (release_id, instance_id, title, artist, year, format, genre, thumb_url, cover_image_url, tracklist, vinyl_size)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(release_id) DO UPDATE SET
        instance_id = excluded.instance_id,
        title = excluded.title,
@@ -58,6 +74,7 @@ export async function upsertReleases(
        genre = excluded.genre,
        thumb_url = excluded.thumb_url,
        cover_image_url = excluded.cover_image_url,
+       vinyl_size = excluded.vinyl_size,
        updated_at = datetime('now')`
   );
 
@@ -72,7 +89,8 @@ export async function upsertReleases(
       r.genre,
       r.thumb_url,
       r.cover_image_url,
-      r.tracklist ? JSON.stringify(r.tracklist) : null
+      r.tracklist ? JSON.stringify(r.tracklist) : null,
+      r.vinyl_size
     )
   );
 
@@ -82,6 +100,7 @@ export async function upsertReleases(
 export interface SearchOptions {
   q?: string;
   format?: string;
+  vinyl_size?: string;
   genre?: string;
   year?: number;
   artist?: string;
@@ -104,6 +123,10 @@ export async function searchReleases(
   if (options.format) {
     conditions.push("format = ?");
     params.push(options.format);
+  }
+  if (options.vinyl_size) {
+    conditions.push("vinyl_size = ?");
+    params.push(options.vinyl_size);
   }
   if (options.genre) {
     conditions.push("genre = ?");
@@ -165,6 +188,7 @@ function parseReleaseTracklist(row: Record<string, unknown>): Release {
     thumb_url: row.thumb_url as string | null,
     cover_image_url: row.cover_image_url as string | null,
     tracklist,
+    vinyl_size: row.vinyl_size as string | null,
   };
 }
 

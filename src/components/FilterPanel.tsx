@@ -2,6 +2,9 @@ interface Props {
   format: string;
   formats: string[];
   onFormatChange: (format: string) => void;
+  vinylSize: string;
+  vinylSizes: string[];
+  onVinylSizeChange: (size: string) => void;
   genre: string;
   genres: string[];
   onGenreChange: (genre: string) => void;
@@ -11,6 +14,9 @@ export default function FilterPanel({
   format,
   formats,
   onFormatChange,
+  vinylSize,
+  vinylSizes,
+  onVinylSizeChange,
   genre,
   genres,
   onGenreChange,
@@ -59,6 +65,19 @@ export default function FilterPanel({
             ]}
           />
         </div>
+        {format && vinylSizes.length > 0 && (
+          <div class="flex-1 min-w-[140px]">
+            <Select
+              value={vinylSize}
+              onChange={onVinylSizeChange}
+              label="Size"
+              options={[
+                { value: "", label: "All Sizes" },
+                ...vinylSizes.map((s) => ({ value: s, label: s })),
+              ]}
+            />
+          </div>
+        )}
         {genres && genres.length > 0 && (
           <div class="flex-1 min-w-[140px]">
             <Select

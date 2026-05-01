@@ -1,6 +1,6 @@
 const DISCOGS_BASE_URL = "https://api.discogs.com";
 const MAX_RETRIES = 3;
-const PAGE_DELAY_MS = 1000;
+const PAGE_DELAY_MS = 3000;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

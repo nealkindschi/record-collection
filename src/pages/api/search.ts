@@ -5,6 +5,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
   const db = locals.runtime.env.DB;
   const q = url.searchParams.get("q") || undefined;
   const format = url.searchParams.get("format") || undefined;
+  const vinylSize = url.searchParams.get("vinyl_size") || undefined;
   const genre = url.searchParams.get("genre") || undefined;
   const yearParam = url.searchParams.get("year");
   const year = yearParam ? parseInt(yearParam, 10) : undefined;
@@ -19,6 +20,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
     const { results, total } = await searchReleases(db, {
       q,
       format,
+      vinyl_size: vinylSize,
       genre,
       year,
       artist,

@@ -11,5 +11,9 @@ database_id = "71e620bf-1115-4594-8a78-5479b533cb07"
 binding = "SYNC_KV"
 id = "0b8cde34483545378dc864eae8b52b21"
 
+[[kv_namespaces]]
+binding = "SESSION"
+id = "da7327b206914b2a8b45da2f9f7355e9"
+
 [vars]
 DISCOGS_USERNAME = "nkinds"

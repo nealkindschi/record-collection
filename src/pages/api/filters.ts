@@ -28,9 +28,22 @@ export const GET: APIRoute = async ({ locals }) => {
       )
       .all<{ artist: string }>();
 
+    const vinylSizes = await db
+      .prepare(
+        `SELECT DISTINCT vinyl_size FROM releases WHERE vinyl_size IS NOT NULL
+         ORDER BY CASE vinyl_size
+           WHEN '12"' THEN 1
+           WHEN '10"' THEN 2
+           WHEN '7"' THEN 3
+           ELSE 4
+         END`
+      )
+      .all<{ vinyl_size: string }>();
+
     return new Response(
       JSON.stringify({
         formats: formats.results.map((r) => r.format),
+        vinyl_sizes: vinylSizes.results.map((r) => r.vinyl_size),
         genres: genres.results.map((r) => r.genre),
         minYear: years?.min_year ?? null,
         maxYear: years?.max_year ?? null,

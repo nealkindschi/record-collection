@@ -5,7 +5,7 @@ import SearchBar from "../components/SearchBar";
 import { searchReleases } from "../utils/db";
 
 const db = Astro.locals.runtime.env.DB;
-const { results: initialResults, total: initialTotal } = await searchReleases(db, { limit: 24, offset: 0 });
+const { results: initialResults, total: initialTotal } = await searchReleases(db, { limit: 25, offset: 0 });
 ---
 
 <BaseLayout title="Record Collection">
