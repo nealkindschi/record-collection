@@ -25,70 +25,68 @@ export default function FilterPanel({
     ? Array.from({ length: years.max - years.min + 1 }, (_, i) => years.max - i)
     : [];
 
-  return (
-    <div class="bg-gray-900 rounded-lg p-4">
-      <h2 class="text-sm font-semibold text-gray-300 mb-3">Filters</h2>
-
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs text-gray-400 mb-1">Format</label>
-          <select
-            value={format}
-            onChange={(e) =>
-              onFormatChange((e.target as HTMLSelectElement).value)
-            }
-            class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="">All Formats</option>
-            {formats.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {genres && genres.length > 0 && (
-          <div>
-            <label class="block text-xs text-gray-400 mb-1">Genre</label>
-            <select
-              value={genre}
-              onChange={(e) =>
-                onGenreChange((e.target as HTMLSelectElement).value)
-              }
-              class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Genres</option>
-              {genres.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {years && (
-          <div>
-            <label class="block text-xs text-gray-400 mb-1">Year</label>
-            <select
-              value={year}
-              onChange={(e) => {
-                const val = (e.target as HTMLSelectElement).value;
-                onYearChange(val ? parseInt(val, 10) : "");
-              }}
-              class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="">All Years</option>
-              {yearOptions.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+  function Select({ value, onChange, label, options }: {
+    value: string | number;
+    onChange: (v: string) => void;
+    label: string;
+    options: { value: string; label: string }[];
+  }) {
+    return (
+      <div>
+        <label class="block text-xs font-medium text-wax-400 mb-1.5 tracking-wide uppercase">{label}</label>
+        <select
+          value={value}
+          onChange={(e) => onChange((e.target as HTMLSelectElement).value)}
+          class="w-full bg-crate-800 border border-crate-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-sun-500/50 focus:ring-1 focus:ring-sun-500/20 transition-all duration-200 appearance-none cursor-pointer"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239c9185' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 12px center",
+            paddingRight: "36px",
+          }}
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
       </div>
+    );
+  }
+
+  return (
+    <div class="bg-crate-800/50 border border-crate-600/50 rounded-xl p-4 space-y-4">
+      <h2 class="font-display text-lg tracking-wide text-sun-400">Filters</h2>
+      <Select
+        value={format}
+        onChange={onFormatChange}
+        label="Format"
+        options={[
+          { value: "", label: "All Formats" },
+          ...formats.map((f) => ({ value: f, label: f })),
+        ]}
+      />
+      {genres && genres.length > 0 && (
+        <Select
+          value={genre}
+          onChange={onGenreChange}
+          label="Genre"
+          options={[
+            { value: "", label: "All Genres" },
+            ...genres.map((g) => ({ value: g, label: g })),
+          ]}
+        />
+      )}
+      {years && (
+        <Select
+          value={year}
+          onChange={(v) => onYearChange(v ? parseInt(v, 10) : "")}
+          label="Year"
+          options={[
+            { value: "", label: "All Years" },
+            ...yearOptions.map((y) => ({ value: String(y), label: String(y) })),
+          ]}
+        />
+      )}
     </div>
   );
 }

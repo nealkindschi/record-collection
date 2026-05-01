@@ -83,22 +83,23 @@ export default function TracklistOverlay({ release, onClose }: Props) {
         if (e.target === e.currentTarget) handleClose();
       }}
       style={{
-        backgroundColor: visible ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0)",
-        backdropFilter: visible ? "blur(4px)" : "none",
-        transition: "background-color 0.2s, backdrop-filter 0.2s",
+        backgroundColor: visible ? "rgba(15, 13, 11, 0.85)" : "rgba(15, 13, 11, 0)",
+        backdropFilter: visible ? "blur(8px)" : "none",
+        WebkitBackdropFilter: visible ? "blur(8px)" : "none",
+        transition: "background-color 0.3s, backdrop-filter 0.3s",
       }}
     >
       <div
-        class="w-full max-w-lg bg-gray-900 rounded-xl shadow-2xl shadow-purple-500/20 overflow-hidden"
+        class="w-full max-w-lg bg-crate-900 border border-crate-600/50 rounded-2xl shadow-2xl shadow-sun-500/10 overflow-hidden"
         style={{
-          transform: visible ? "scale(1)" : "scale(0.9)",
+          transform: visible ? "scale(1) translateY(0)" : "scale(0.95) translateY(10px)",
           opacity: visible ? 1 : 0,
-          transition: "transform 0.3s ease-out, opacity 0.2s ease-out",
+          transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease-out",
         }}
       >
-        <div class="flex items-start gap-4 p-5 border-b border-gray-800">
+        <div class="flex items-start gap-4 p-5 border-b border-crate-600/50">
           {imgSrc && (
-            <div class="w-16 h-16 rounded-lg overflow-hidden shrink-0">
+            <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-lg">
               <img
                 src={imgSrc}
                 alt={release.title}
@@ -106,17 +107,17 @@ export default function TracklistOverlay({ release, onClose }: Props) {
               />
             </div>
           )}
-          <div class="min-w-0 flex-1 pt-1">
-            <h2 class="text-base font-semibold text-white truncate">
+          <div class="min-w-0 flex-1 pt-0.5">
+            <h2 class="text-base font-semibold text-white truncate leading-tight">
               {release.title}
             </h2>
-            <p class="text-sm text-gray-400 truncate">{release.artist}</p>
-            <div class="flex items-center gap-2 mt-1">
+            <p class="text-sm text-wax-400 truncate">{release.artist}</p>
+            <div class="flex items-center gap-2 mt-1.5">
               {release.year && (
-                <span class="text-xs text-gray-500">{release.year}</span>
+                <span class="text-xs text-wax-500">{release.year}</span>
               )}
               {release.format && (
-                <span class="text-xs bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+                <span class="text-xs bg-crate-700 text-wax-400 px-1.5 py-0.5 rounded-md border border-crate-600/50">
                   {release.format}
                 </span>
               )}
@@ -124,55 +125,48 @@ export default function TracklistOverlay({ release, onClose }: Props) {
           </div>
           <button
             onClick={handleClose}
-            class="text-gray-400 hover:text-white transition-colors p-1 -m-1"
+            class="text-wax-500 hover:text-white transition-colors p-1.5 -m-1.5 rounded-lg hover:bg-crate-700/50"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <div class="max-h-[60vh] overflow-y-auto p-5">
           {loading && (
-            <div class="flex flex-col items-center justify-center py-10 gap-3">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500" />
-              <p class="text-sm text-gray-400">Loading tracklist...</p>
+            <div class="flex flex-col items-center justify-center py-12 gap-3">
+              <div class="w-8 h-8 rounded-full border-2 border-sun-500/30 border-t-sun-500 animate-spin" />
+              <p class="text-sm text-wax-500">Loading tracklist...</p>
             </div>
           )}
 
           {error && (
-            <div class="text-center py-10">
-              <p class="text-red-400 text-sm">{error}</p>
-              <p class="text-gray-500 text-xs mt-1">
-                Try clicking the card again later.
-              </p>
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+              <p class="text-red-400/80 text-sm">{error}</p>
+              <p class="text-wax-500 text-xs mt-2">Try clicking the card again later</p>
             </div>
           )}
 
           {tracklist && tracklist.length > 0 && (
-            <ol class="space-y-1">
-              {tracklist.map((track) => (
+            <ol class="space-y-0.5">
+              {tracklist.map((track, i) => (
                 <li
                   key={`${track.position}-${track.title}`}
-                  class="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-gray-800/50 transition-colors"
+                  class="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-crate-800/60 transition-colors group"
+                  style={{
+                    animation: visible ? `slideUp 0.3s ease-out both` : "none",
+                    animationDelay: `${i * 30}ms`,
+                  }}
                 >
-                  <span class="text-xs text-gray-500 w-8 text-right shrink-0 font-mono">
+                  <span class="text-xs text-wax-500 w-8 text-right shrink-0 font-mono tabular-nums">
                     {track.position}
                   </span>
-                  <span class="text-sm text-gray-200 flex-1 truncate">
+                  <span class="text-sm text-wax-200 flex-1 truncate group-hover:text-white transition-colors">
                     {track.title}
                   </span>
                   {track.duration && (
-                    <span class="text-xs text-gray-500 shrink-0">
+                    <span class="text-xs text-wax-500 shrink-0 tabular-nums">
                       {track.duration}
                     </span>
                   )}
@@ -182,10 +176,13 @@ export default function TracklistOverlay({ release, onClose }: Props) {
           )}
 
           {tracklist && tracklist.length === 0 && !loading && (
-            <div class="text-center py-10">
-              <p class="text-gray-400 text-sm">
-                No tracklist available for this release.
-              </p>
+            <div class="flex flex-col items-center justify-center py-12 text-center">
+              <div class="w-12 h-12 rounded-full bg-crate-800 border border-crate-600 flex items-center justify-center mb-3">
+                <svg class="w-6 h-6 text-wax-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                </svg>
+              </div>
+              <p class="text-wax-400 text-sm">No tracklist available</p>
             </div>
           )}
         </div>

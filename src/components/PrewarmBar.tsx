@@ -58,20 +58,20 @@ export default function PrewarmBar({ active }: Props) {
   const complete = done >= total && total > 0;
 
   return (
-    <div class="fixed bottom-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur border-t border-gray-800 px-4 py-2">
-      <div class="max-w-7xl mx-auto flex items-center gap-3">
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-crate-950/95 backdrop-blur border-t border-crate-600/50 px-4 py-3">
+      <div class="max-w-7xl mx-auto flex items-center gap-4">
         <div class="flex-1 min-w-0">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs text-gray-400">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs text-wax-400">
               {complete
                 ? `Cached ${total} tracklists`
                 : `Caching tracklists: ${done}/${total}`}
             </span>
-            <span class="text-xs text-gray-500">{pct}%</span>
+            <span class="text-xs text-wax-500 tabular-nums">{pct}%</span>
           </div>
-          <div class="w-full bg-gray-800 rounded-full h-1.5">
+          <div class="w-full bg-crate-700 rounded-full h-1.5 overflow-hidden">
             <div
-              class="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+              class="h-full rounded-full bg-gradient-to-r from-sun-600 to-ember-300 transition-all duration-500 ease-out"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -79,7 +79,7 @@ export default function PrewarmBar({ active }: Props) {
         {complete && (
           <button
             onClick={() => setDismissed(true)}
-            class="text-gray-400 hover:text-white text-xs shrink-0"
+            class="text-wax-500 hover:text-wax-300 text-xs font-medium shrink-0 transition-colors"
           >
             Dismiss
           </button>

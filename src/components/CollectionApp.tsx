@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "preact/hooks";
 import type { Release } from "../utils/db";
-import SearchBar from "./SearchBar";
 import FilterPanel from "./FilterPanel";
+
+const SEARCH_EVENT = "search:query";
 import CollectionGrid from "./CollectionGrid";
 import TracklistOverlay from "./TracklistOverlay";
 import PrewarmBar from "./PrewarmBar";
@@ -14,7 +15,6 @@ interface Props {
 }
 
 export default function CollectionApp({ initialResults, initialTotal }: Props) {
-  const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [format, setFormat] = useState("");
   const [genre, setGenre] = useState("");
@@ -22,8 +22,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const [total, setTotal] = useState(initialTotal ?? 0);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [syncError, setSyncError] = useState("");
+
   const [formats, setFormats] = useState<string[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
   const [years, setYears] = useState<{ min: number; max: number } | null>(null);
@@ -33,9 +32,12 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const isInitialRender = useRef(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 300);
-    return () => clearTimeout(timer);
-  }, [query]);
+    function handleSearch(e: CustomEvent) {
+      setDebouncedQuery(e.detail);
+    }
+    window.addEventListener(SEARCH_EVENT, handleSearch as EventListener);
+    return () => window.removeEventListener(SEARCH_EVENT, handleSearch as EventListener);
+  }, []);
 
   const fetchResults = useCallback(async (offset = 0, append = false) => {
     if (append) {
@@ -100,24 +102,6 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
     loadFilters();
   }, []);
 
-  async function handleSync() {
-    setSyncing(true);
-    setSyncError("");
-    try {
-      const res = await fetch("/api/sync", { method: "POST" });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        await fetchResults();
-      } else {
-        setSyncError(data.error || "Sync failed");
-      }
-    } catch {
-      setSyncError("Network error during sync");
-    } finally {
-      setSyncing(false);
-    }
-  }
-
   function handleLoadMore() {
     fetchResults(results.length, true);
   }
@@ -125,15 +109,8 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
   const hasMore = results.length < total;
 
   return (
-    <div class="flex flex-col md:flex-row gap-6">
-      <aside class="w-full md:w-56 shrink-0 space-y-4">
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          class="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-4 py-2.5 transition-colors"
-        >
-          {syncing ? "Syncing..." : "Sync Collection"}
-        </button>
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <aside class="w-full lg:w-56 shrink-0 space-y-4">
         <FilterPanel
           format={format}
           formats={formats}
@@ -145,12 +122,8 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
           years={years}
           onYearChange={setYear}
         />
-        {syncError && (
-          <p class="text-xs text-red-400 mt-2">{syncError}</p>
-        )}
       </aside>
-      <main class="flex-1 min-w-0">
-        <SearchBar query={query} onQueryChange={setQuery} />
+      <main class="flex-1 min-w-0 space-y-5">
         <CollectionGrid
           results={results}
           total={total}
