@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "preact/hooks";
 import type { Release } from "../utils/db";
 import FilterPanel from "./FilterPanel";
-
-const SEARCH_EVENT = "search:query";
 import CollectionGrid from "./CollectionGrid";
 import TracklistOverlay from "./TracklistOverlay";
 import PrewarmBar from "./PrewarmBar";
+
+const SEARCH_EVENT = "search:query";
 
 const PAGE_SIZE = 24;
 
@@ -25,8 +25,6 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
 
   const [formats, setFormats] = useState<string[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
-  const [years, setYears] = useState<{ min: number; max: number } | null>(null);
-  const [year, setYear] = useState<number | "">("");
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
   const [prewarmReady, setPrewarmReady] = useState(false);
   const isInitialRender = useRef(true);
@@ -50,7 +48,6 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       if (debouncedQuery) params.set("q", debouncedQuery);
       if (format) params.set("format", format);
       if (genre) params.set("genre", genre);
-      if (year) params.set("year", String(year));
       params.set("limit", String(PAGE_SIZE));
       params.set("offset", String(offset));
       const res = await fetch(`/api/search?${params.toString()}`);
@@ -70,7 +67,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [debouncedQuery, format, genre, year]);
+  }, [debouncedQuery, format, genre]);
 
   useEffect(() => {
     if (isInitialRender.current && initialResults) {
@@ -92,9 +89,6 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
         const data = await res.json();
         setFormats(data.formats ?? []);
         setGenres(data.genres ?? []);
-        if (data.minYear && data.maxYear) {
-          setYears({ min: data.minYear, max: data.maxYear });
-        }
       } catch {
         // filters will remain empty
       }
@@ -118,9 +112,6 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
           genre={genre}
           genres={genres}
           onGenreChange={setGenre}
-          year={year}
-          years={years}
-          onYearChange={setYear}
         />
       </aside>
       <main class="flex-1 min-w-0 space-y-5">
