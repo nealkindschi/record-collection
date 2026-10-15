@@ -7,7 +7,9 @@
     "build": "astro build",
     "preview": "wrangler pages dev ./dist",
     "sync-db": "wrangler d1 execute record-collection-db --local --file=./schema.sql",
-    "astro": "astro"
+    "astro": "astro",
+    "dev:sync": "wrangler dev -c workers/sync/wrangler.toml",
+    "deploy:sync": "wrangler deploy -c workers/sync/wrangler.toml"
   },
   "dependencies": {
     "astro": "^5.7.0",
