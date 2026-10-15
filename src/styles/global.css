@@ -50,6 +50,7 @@
 }
 
 html {
+  scroll-padding-top: calc(var(--header-h, 6rem) + 1rem);
   font-family: "Outfit", sans-serif;
 }
 

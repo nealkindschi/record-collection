@@ -111,7 +111,7 @@ export default function CollectionApp({ initialResults, initialTotal }: Props) {
 
   return (
     <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
-      <aside class="w-full lg:w-56 shrink-0 space-y-4">
+      <aside class="w-full lg:w-56 shrink-0 space-y-4 lg:sticky lg:self-start lg:top-[calc(var(--header-h,6rem)+1rem)] lg:max-h-[calc(100vh-var(--header-h,6rem)-2rem)] lg:overflow-y-auto">
         <FilterPanel
           format={format}
           formats={formats}
