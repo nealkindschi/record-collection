@@ -52,6 +52,7 @@ export function mapDiscogsToRelease(item: DiscogsCollectionItem): Release {
     genre: basic.genres?.[0] ?? null,
     thumb_url: basic.thumb || null,
     cover_image_url: basic.cover_image || null,
+    tracklist: null,
     vinyl_size: firstFormat?.name === "Vinyl" ? getVinylSize(descriptions) : null,
   };
 }

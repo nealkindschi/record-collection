@@ -1,0 +1,36 @@
+# Scheduled Worker that keeps the D1 collection in sync with Discogs.
+# Deploy with: npm run deploy:sync
+name = "record-collection-sync"
+main = "index.ts"
+compatibility_date = "2024-12-01"
+
+# Runs hourly via a Durable Object alarm (see index.ts), not a cron trigger:
+# the Free plan's 5 cron triggers are used by other Workers. Visiting the
+# workers.dev URL starts the schedule if needed and shows its status.
+workers_dev = true
+preview_urls = false
+
+[[durable_objects.bindings]]
+name = "SCHEDULER"
+class_name = "SyncScheduler"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SyncScheduler"]
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "record-collection-db"
+database_id = "71e620bf-1115-4594-8a78-5479b533cb07"
+
+[[kv_namespaces]]
+binding = "SYNC_KV"
+id = "0b8cde34483545378dc864eae8b52b21"
+
+[vars]
+DISCOGS_USERNAME = "nkinds"
+
+# DISCOGS_TOKEN is a secret: wrangler secret put DISCOGS_TOKEN -c workers/sync/wrangler.toml

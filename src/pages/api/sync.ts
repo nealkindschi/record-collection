@@ -1,30 +1,22 @@
 import type { APIRoute } from "astro";
-import { syncAllPages } from "../../utils/discogs";
-import { mapDiscogsToRelease, upsertReleases } from "../../utils/db";
+import { runSync } from "../../utils/sync";
 
-export const POST: APIRoute = async ({ locals }) => {
+// Manual full sync. The scheduled Worker in workers/sync runs this hourly;
+// this endpoint is for forcing one, and requires the SYNC_SECRET bearer token.
+export const POST: APIRoute = async ({ locals, request }) => {
   const env = locals.runtime.env;
-  const db = env.DB;
-  const kv = env.SYNC_KV;
-  const token = env.DISCOGS_TOKEN;
-  const username = env.DISCOGS_USERNAME;
 
-  if (!token || !username) {
-    return new Response(
-      JSON.stringify({ error: "Missing Discogs credentials" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+  const auth = request.headers.get("Authorization");
+  if (!env.SYNC_SECRET || auth !== `Bearer ${env.SYNC_SECRET}`) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {
-    const totalSynced = await syncAllPages(username, token, async (items) => {
-      const releases = items.map(mapDiscogsToRelease);
-      await upsertReleases(db, releases);
-    });
-
-    await kv.put("last_sync", new Date().toISOString());
-
-    return new Response(JSON.stringify({ success: true, totalSynced }), {
+    const result = await runSync(env, { force: true });
+    return new Response(JSON.stringify({ success: true, ...result }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err: unknown) {
